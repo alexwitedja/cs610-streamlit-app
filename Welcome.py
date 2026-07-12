@@ -46,4 +46,9 @@ under triage rates, probabilistic calibration and SHAP based explainability.
 - **Kaki Care** - Try the chat interface for users needing a quick acuity assessment with features collectible from your home.
 - **Data** - Explore the data being used to train the models, features that were engineered and the two feature sets we used.
 - **Model Comparisons** - See the performance of all 4 models we experimented, choose to see tuned / untuned versions.
+
+---
+
+*I built this streamlit app for my personal portfolio. It is based on a project for SMU's CS610 (Applied Machine Learning) built by Alexander Witedja, Lilian Young, Tran Nguyen Ngoc Nhu, Li Tong Yang, Ryan Edbert Nurtanio. Special thanks to [MIMIC](https://mimic.mit.edu/) for providing the dataset. Source code: https://github.com/alexwitedja/cs610-streamlit-app.*
+            
 """)
