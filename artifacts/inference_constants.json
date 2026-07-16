@@ -1,0 +1,152 @@
+{
+  "_note": "Train-split medians used to fill fields a user skips. The notebook KNN-imputes; the app median-fills to avoid shipping the training matrix. Disclose in the UI.",
+  "clips": {
+    "temperature": [
+      35.0,
+      41.7
+    ],
+    "heartrate": [
+      20,
+      300
+    ],
+    "resprate": [
+      5,
+      60
+    ],
+    "o2sat": [
+      50,
+      100
+    ],
+    "sbp": [
+      50,
+      300
+    ],
+    "dbp": [
+      20,
+      200
+    ]
+  },
+  "medians": {
+    "temperature": 36.6667,
+    "heartrate": 84.0,
+    "resprate": 18.0,
+    "o2sat": 99.0,
+    "sbp": 133.0,
+    "dbp": 77.0,
+    "pain": 4.0,
+    "age_at_visit": 53.0,
+    "prior_ed_visits_total": 1.0,
+    "prior_ed_visits_1yr": 0.0,
+    "prior_admissions_1yr": 0.0,
+    "days_since_last_ed": 1174.0549,
+    "last_ed_admitted": 0.0,
+    "arrival_hour": 14.0,
+    "arrival_dow": 3.0,
+    "arrival_month": 7.0
+  },
+  "age_range_trained": [
+    18.0,
+    103.0
+  ],
+  "transport_categories": [
+    "AMBULANCE",
+    "HELICOPTER",
+    "OTHER",
+    "UNKNOWN",
+    "WALK IN"
+  ],
+  "med_classes": [
+    "cardiac",
+    "diabetes",
+    "respiratory",
+    "psych",
+    "opioid",
+    "gi",
+    "thyroid",
+    "anticonvulsant",
+    "bloodthinner"
+  ],
+  "polypharmacy_threshold": 5,
+  "schema": {
+    "patient": {
+      "n_features": 783,
+      "tabular_cols": [
+        "gender_M",
+        "age_at_visit",
+        "temperature",
+        "heartrate",
+        "pain",
+        "pain_missing",
+        "has_med_cardiac",
+        "has_med_diabetes",
+        "has_med_respiratory",
+        "has_med_psych",
+        "has_med_opioid",
+        "has_med_gi",
+        "has_med_thyroid",
+        "has_med_anticonvulsant",
+        "has_med_bloodthinner"
+      ]
+    },
+    "hospital": {
+      "n_features": 823,
+      "tabular_cols": [
+        "gender_M",
+        "age_at_visit",
+        "med_count_total",
+        "med_count_cardiac",
+        "med_count_diabetes",
+        "med_count_respiratory",
+        "med_count_psych",
+        "med_count_opioid",
+        "med_count_gi",
+        "med_count_thyroid",
+        "med_count_anticonvulsant",
+        "med_count_bloodthinner",
+        "has_polypharmacy",
+        "med_count_total_log",
+        "temperature",
+        "heartrate",
+        "resprate",
+        "o2sat",
+        "sbp",
+        "dbp",
+        "pain",
+        "pain_missing",
+        "arrival_hour",
+        "arrival_dow",
+        "is_weekend",
+        "arrival_month",
+        "transport_AMBULANCE",
+        "transport_HELICOPTER",
+        "transport_OTHER",
+        "transport_UNKNOWN",
+        "transport_WALK IN",
+        "prior_ed_visits_total",
+        "prior_ed_visits_1yr",
+        "prior_admissions_1yr",
+        "days_since_last_ed",
+        "last_ed_admitted",
+        "shock_index",
+        "map",
+        "pulse_pressure",
+        "qsofa_partial",
+        "elderly",
+        "very_elderly",
+        "pediatric",
+        "fever",
+        "hypoxia",
+        "severe_hypoxia",
+        "tachycardia",
+        "bradycardia",
+        "tachypnea",
+        "hypotension",
+        "hypertensive_urg",
+        "elderly_hypoxia",
+        "elderly_tachycardia",
+        "elderly_hypotension",
+        "elderly_shock"
+      ]
+    }
+  }
+}
