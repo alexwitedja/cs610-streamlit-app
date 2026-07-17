@@ -1,5 +1,7 @@
 import streamlit as st
 
+from src.inference_pipeline import load_embedder, load_frame_builder, load_models
+
 st.set_page_config(
     page_title="Inference",
     page_icon="🩺",
@@ -20,8 +22,16 @@ mode = st.sidebar.radio(
     ),
 )
 
+def predict(X, *models):
+    pass
+
+embedder = load_embedder()
+
 if mode == "Patient-facing":
-    with st.form(key="Patient-facing"):
+    lr, xgb, mlp, ensemble = load_models("patient")
+    frame_builder = load_frame_builder("patient")
+
+    with st.form(key="Patient-fa st.cache_data's hashing-by-value-copy behavior: cache_resource explicicing"):
         st.subheader("Patient-facing inference", help="Lean and limited number of features.")
         left, mid, right = st.columns(3)
         temperature = left.number_input("Temperature (°C)", 35, 42)
@@ -34,7 +44,13 @@ if mode == "Patient-facing":
         medication_history = st.multiselect("Medication History", options=["Diabetes", "Cardiac", "Respiratory", "Mental health, sleep, or anxiety", "Opioid", "Anticonvlusant", "Bloodthinner", "Thyroid", "Digestive"], help="Based on the medicine you have taken.")
         chief_compmlaint = st.text_area("Chief complaint")
         submitted = st.form_submit_button("Run", type="primary")
+
+    if submitted:
+        pass
 else:
+    frame_builder = load_frame_builder("hospital")
+    lr, xgb, mlp, ensemble = load_models("hospital")
+    
     with st.form(key="Hospital_facing"):
         st.subheader("Hospital-facing inference", help="A more complete set of features.")
         left, mid, right = st.columns(3)
@@ -111,26 +127,8 @@ else:
 
 st.divider()
 
-if mode == "Patient-facing":
-    pass
-else:
-    pass
-
 st.markdown("""
 ### Result
-
-Predicted acuity, and how confident the model is, will render here once a presentation is entered:
-
-**Predicted acuity: ESI `{pred}`**
-`{esi_label}` — *(1 = Resuscitation · 2 = Emergent · 3 = Urgent · 4 = Less urgent · 5 = Non-urgent)*
-
-The full probability distribution across all five classes is shown as a bar chart — not just the winner.
-An ordinal model that is 45/40 split between ESI-2 and ESI-3 is telling you something a single number hides.
-
-When tuning has overridden the argmax, this is stated explicitly:
-> ⚠️ **Escalated by the safety rule.** Raw model said **ESI `{raw_pred}`**, but P(ESI-`{k}`) = **`{p_k}`**
-> cleared the **`{t_k}`** threshold. This is the cascade doing its job — and it is exactly the kind of
-> over-triage the tuned operating point accepts on purpose.
 """)
 
 st.caption(

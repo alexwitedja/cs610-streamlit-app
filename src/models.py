@@ -22,12 +22,14 @@ admin/verify_models.py.
 
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 
 N_CLASSES = 5
 
@@ -144,13 +146,28 @@ class MLPEnsemble(BaseModel):
 
 
 class XGBoostModel(BaseModel):
-    """Gradient boosting on the full raw feature set. classes_ is [0..4] -> ascending ESI."""
+    """Gradient boosting on the full raw feature set. classes_ is [0..4] -> ascending ESI.
 
-    def __init__(self, bundle_path: str | Path, side: str):
+    Loads the .ubj export rather than the original pickle. Pickled xgboost models are not
+    portable across versions (they warn under 3.2.0 and can break on a version bump), and the
+    pickles also carry a CUDA device config from Colab that warns on every CPU load.
+    Regenerate with admin/export_xgb.py; the round-trip is prediction-identical.
+    """
+
+    def __init__(self, model_path: str | Path, side: str):
         super().__init__(side)
-        bundle = joblib.load(bundle_path)
-        self.model = bundle["model"]
-        self.feature_names = bundle["feature_names"]
+        model_path = Path(model_path)
+        meta_path = model_path.with_name(f"{model_path.stem}_meta.json")
+        if not meta_path.exists():
+            raise FileNotFoundError(
+                f"{meta_path.name} missing — it carries feature_names, without which column "
+                f"order is a guess. Regenerate with admin/export_xgb.py."
+            )
+
+        self.feature_names = json.loads(meta_path.read_text())["feature_names"]
+        self.model = xgb.XGBClassifier()
+        self.model.load_model(model_path)
+        self.model.set_params(device="cpu")
 
     def _transform(self, X: pd.DataFrame) -> np.ndarray:
         return X[self.feature_names].to_numpy(dtype=np.float32)
