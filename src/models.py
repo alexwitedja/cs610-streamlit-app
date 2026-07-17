@@ -143,6 +143,9 @@ class MLPEnsemble(BaseModel):
         z = self._transform(X)
         probs = np.mean([self._forward(z, layers) for layers in self.seeds], axis=0)
         return self._check(probs, len(X))
+    
+    def __str__(self):
+        return "MLP Ensemble"
 
 
 class XGBoostModel(BaseModel):
@@ -175,6 +178,9 @@ class XGBoostModel(BaseModel):
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         return self._check(self.model.predict_proba(self._transform(X)), len(X))
 
+    def __str__(self):
+        return "XGBoost"
+    
 
 class LogisticRegressionModel(BaseModel):
     """Linear baseline. CLS is compressed 768 -> 32 by a fitted PCA, then everything is scaled.
@@ -199,6 +205,9 @@ class LogisticRegressionModel(BaseModel):
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         return self._check(self.model.predict_proba(self._transform(X)), len(X))
 
+    def __str__(self):
+        return "Logistic Regression"
+
 
 class SoftVotingEnsemble(BaseModel):
     """Weighted soft vote over base models that each own their transform.
@@ -219,6 +228,9 @@ class SoftVotingEnsemble(BaseModel):
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         probs = self.w_mlp * self.mlp.predict_proba(X) + self.w_xgb * self.xgb.predict_proba(X)
         return self._check(probs, len(X))
+    
+    def __str__(self):
+        return "Soft Voting Ensemble"
 
 
 def cascade(probs: np.ndarray, t1: float, t2: float) -> np.ndarray:

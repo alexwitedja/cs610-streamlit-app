@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import pandas as pd
 
 import streamlit as st
 
 from src.embedder import ClinicalBertEmbedder
 from src.frame_builder import FrameBuilder
-from src.models import LogisticRegressionModel, MLPEnsemble, SoftVotingEnsemble, XGBoostModel
+from src.models import LogisticRegressionModel, MLPEnsemble, SoftVotingEnsemble, XGBoostModel, cascade
 
 ARTIFACTS_DIR = Path().resolve() / "artifacts"
 MODELS_DIR = ARTIFACTS_DIR / "models"
@@ -31,5 +32,18 @@ def load_models(side: str):
 @st.cache_resource
 def load_frame_builder(side: str):
     embedder = load_embedder()
-    constants = json.loads(ARTIFACTS_DIR / "inference_constants.json")
+    constants = json.loads((ARTIFACTS_DIR / "inference_constants.json").read_text())
     return FrameBuilder(embedder, constants, side)
+
+
+def single_inference(raw_data: pd.DataFrame, side: str):
+    models = load_models(side)
+    frame_builder = load_frame_builder(side)
+    X = frame_builder.build(raw_data)
+    result = {}
+    for model in models:
+        probs = model.predict_proba(X)
+        result[str(model)] = probs
+
+    return result
+    
