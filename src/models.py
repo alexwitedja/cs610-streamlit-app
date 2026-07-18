@@ -231,22 +231,3 @@ class SoftVotingEnsemble(BaseModel):
     
     def __str__(self):
         return "Soft Voting Ensemble"
-
-
-def cascade(probs: np.ndarray, t1: float, t2: float) -> np.ndarray:
-    """Priority-threshold cascade -> ESI 1-5.
-
-        if P(ESI-1) >= t1:   ESI-1
-        elif P(ESI-2) >= t2: ESI-2
-        else:                argmax
-
-    Deliberately trades accuracy for critical recall. Kept outside the model classes because it
-    is an operating-point choice, not part of the model: the same probabilities serve both the
-    tuned and untuned views, so a UI toggle costs no extra inference.
-    """
-    preds = np.full(len(probs), -1, dtype=int)
-    preds[probs[:, 0] >= t1] = 0
-    preds[(preds == -1) & (probs[:, 1] >= t2)] = 1
-    unresolved = preds == -1
-    preds[unresolved] = probs[unresolved].argmax(axis=1)
-    return preds + 1

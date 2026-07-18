@@ -1,7 +1,8 @@
 import streamlit as st
 
-from src.inference_pipeline import single_inference
+from src.inference_pipeline import single_inference, cascade
 from datetime import date, time, datetime
+import pandas as pd
 
 st.set_page_config(
     page_title="Inference",
@@ -9,7 +10,7 @@ st.set_page_config(
 )
 
 st.title("Try it")
-st.markdown("Enter a presentation and see what KiasuCare predicts.")
+st.markdown("Fill in the form or use the synthetic default values, then see what KiasuCare predicts.")
 
 st.caption("Predictions are illustrative. This is a coursework model on US data — do not use it for real triage.")
 
@@ -30,6 +31,7 @@ MED_LABELS = {
     "Thyroid": "thyroid", "Digestive": "gi",
 }
 
+pred_result = None
 if mode == "Patient-facing":
     with st.form(key="patient_facing"):
         st.subheader("Patient-facing inference", help="Lean and limited number of features.")
@@ -61,7 +63,6 @@ if mode == "Patient-facing":
             "medications": [MED_LABELS[m] for m in medication_history],
         }
         pred_result = single_inference(presentation, "patient")
-        pred_result
 
 else:
     with st.form(key="hospital_facing"):
@@ -133,19 +134,18 @@ else:
             "pain": None if pain_missing else pain_score,
             "med_counts": med_counts,
             "med_count_total": sum(med_counts.values()),
-            "arrival_transport": transport.upper(),   # -> "WALK IN", "AMBULANCE", ...
+            "arrival_transport": transport.upper(),
             "arrival_hour": arrival.hour,
             "arrival_dow": arrival.weekday(),
             "arrival_month": arrival.month,
             "prior_ed_visits_total": 0 if first_ed_visit else prior_ed_visit_all_time,
             "prior_ed_visits_1yr": 0 if first_ed_visit else prior_ed_visit_1_year,
             "prior_admissions_1yr": 0 if first_ed_visit else prior_admissions_1_year,
-            "days_since_last_ed": 1174 if first_ed_visit else (date.today() - last_ed_visit).days,
+            "days_since_last_ed": 9999 if first_ed_visit else (date.today() - last_ed_visit).days,
             "last_ed_admitted": int(last_visit_admission),
         }
 
         pred_result = single_inference(presentation, "hospital")
-        pred_result
 
 tuned = st.sidebar.checkbox(
     "Apply threshold tuning",
@@ -193,9 +193,31 @@ else:
 
 st.divider()
 
-st.markdown("""
-### Result
-""")
+st.subheader("Result")
+
+if pred_result:
+    if mode == "Patient-facing":
+        best_model = "MLP Ensemble"
+    else:
+        best_model = "Soft Voting Ensemble"
+
+    if tuned:
+        predicted_esi = cascade(pred_result[best_model])[0]
+    else:
+        predicted_esi = pred_result[best_model].argmax() + 1
+
+    st.markdown(f"**Best model ({best_model}) predicted acuity: ESI {predicted_esi}**")
+    st.text("Raw Probability Distribution across 4 models.")
+    table = pd.DataFrame(
+        {
+            "Logistic Regression": pred_result["Logistic Regression"],
+            "XGBoost": pred_result["XGBoost"],
+            "MLP Ensemble": pred_result["MLP Ensemble"],
+            "Soft Voting (MLP + XGB)": pred_result["Soft Voting Ensemble"],
+        },
+        index=["ESI-1", "ESI-2", "ESI-3", "ESI-4", "ESI-5"]
+    )
+    st.bar_chart(table)
 
 st.caption(
     "The free text chief complaint is embedded with ClinicalBERT at inference time. The model is cached "
