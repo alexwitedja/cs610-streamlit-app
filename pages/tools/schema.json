@@ -1,0 +1,46 @@
+{
+  "type": "function",
+  "function": {
+    "name": "get_esi_prediction",
+    "description": "Submit the patient's collected information to run the triage model and get an urgency (ESI) prediction. Call this ONLY after you have gathered, at minimum, the chief complaint, age, and gender. Do not call it earlier, and do not call it if the patient is under 18 or has described a life-threatening emergency (chest pain, trouble breathing, stroke signs, severe bleeding, loss of consciousness) — those are handled separately, without a prediction. When information is missing because the patient could not or would not provide it, omit that field rather than guessing a value.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "chief_complaint": {
+          "type": "string",
+          "description": "The patient's main problem in their own words, as close to verbatim as possible (e.g. 'crushing chest pain radiating to my left arm', 'been vomiting and have stomach pain since last night'). Include duration, location, and character if the patient mentioned them. This free text is the single most important input — capture detail rather than summarizing to one or two words."
+        },
+        "age": {
+          "type": "integer",
+          "description": "The patient's age in years. Must be between 18 and 103; the model is only valid for adults. If the patient is under 18, do NOT call this tool."
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["M", "F"],
+          "description": "The patient's sex: 'M' for male, 'F' for female. The dataset only distinguishes these two categories."
+        },
+        "pain": {
+          "type": ["integer", "null"],
+          "description": "The patient's current pain level on a 0-10 scale, where 0 is no pain and 10 is the worst imaginable. Use null if the patient could not or would not give a pain score — do not default to 0, since 'no pain reported' and 'pain of 0' are different."
+        },
+        "temperature": {
+          "type": ["number", "null"],
+          "description": "The patient's body temperature in degrees Celsius (e.g. 37.2, 38.9). Convert to Celsius if the patient reports Fahrenheit. Use null if they have not measured it."
+        },
+        "heartrate": {
+          "type": ["integer", "null"],
+          "description": "The patient's heart rate in beats per minute (e.g. 88). Many phones and smartwatches can measure this. Use null if unavailable."
+        },
+        "medications": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["cardiac", "diabetes", "respiratory", "psych", "opioid", "gi", "thyroid", "anticonvulsant", "bloodthinner"]
+          },
+          "description": "The categories of regular medication the patient takes, as a list of tags. Map the patient's description to these categories: 'cardiac' (heart, blood pressure, cholesterol), 'diabetes' (insulin, metformin, blood sugar), 'respiratory' (inhalers, asthma, COPD), 'psych' (mental health, sleep, anxiety, antidepressants), 'opioid' (strong prescription painkillers), 'gi' (stomach acid, reflux, nausea), 'thyroid', 'anticonvulsant' (seizure/epilepsy medication), 'bloodthinner' (anticoagulants, warfarin, aspirin for the heart). Use an empty list if the patient takes none. Only include categories the patient actually mentioned."
+        }
+      },
+      "required": ["chief_complaint", "age", "gender"]
+    }
+  }
+}

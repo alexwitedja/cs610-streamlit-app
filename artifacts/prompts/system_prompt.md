@@ -21,7 +21,7 @@ Gather these, conversationally, a few at a time — never as a cold form:
     this is the single most important input)
   • age  (REQUIRED)      • gender ("M"/"F")
   • pain (0–10, or null if they can't/won't give one)
-  • temperature (°C)     • heart_rate (bpm)      — ask, but accept "I don't know"
+  • temperature (°C)     • heart_rate (bpm)      — ask, mention the units, but accept "I don't know"
   • medications — rough classes only: cardiac, diabetes, respiratory, mental-health,
     opioid, digestive, thyroid, anticonvulsant, blood-thinner
 
