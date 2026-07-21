@@ -2,7 +2,7 @@
   "type": "function",
   "function": {
     "name": "get_esi_prediction",
-    "description": "Submit the patient's collected information to run the triage model and get an urgency (ESI) prediction. Call this ONLY after you have gathered, at minimum, the chief complaint, age, and gender. Do not call it earlier, and do not call it if the patient is under 18 or has described a life-threatening emergency (chest pain, trouble breathing, stroke signs, severe bleeding, loss of consciousness) — those are handled separately, without a prediction. When information is missing because the patient could not or would not provide it, omit that field rather than guessing a value.",
+    "description": "Submit the patient's collected information to run the triage model and get an urgency (ESI) prediction. chief_complaint, age, and gender are the technical minimum this function needs to run, but do NOT call it as soon as those three are known — first also ask for pain, temperature, heart rate, and medications, and only call once each of those has been either collected or explicitly declined by the patient ('I don't know' / 'skip' counts as declined). Do not call it if the patient is under 18 or has described a life-threatening emergency (chest pain, trouble breathing, stroke signs, severe bleeding, loss of consciousness) — those are handled separately, without a prediction. When a value is missing because the patient could not or would not provide it, omit that field (or pass null) rather than guessing.",
     "parameters": {
       "type": "object",
       "properties": {
@@ -32,7 +32,7 @@
           "description": "The patient's heart rate in beats per minute (e.g. 88). Many phones and smartwatches can measure this. Use null if unavailable."
         },
         "medications": {
-          "type": "array",
+          "type": ["array", "null"],
           "items": {
             "type": "string",
             "enum": ["cardiac", "diabetes", "respiratory", "psych", "opioid", "gi", "thyroid", "anticonvulsant", "bloodthinner"]

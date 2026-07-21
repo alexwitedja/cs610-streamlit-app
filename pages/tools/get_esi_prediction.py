@@ -1,10 +1,10 @@
-from src.inference_pipeline import load_models, cascade
+from src.inference_pipeline import app_inference, cascade
 
 MED_LABELS = {
-    "Diabetes": "diabetes", "Cardiac": "cardiac", "Respiratory": "respiratory",
-    "Mental health, sleep, or anxiety": "psych", "Opioid": "opioid",
-    "Anticonvulsant": "anticonvulsant", "Bloodthinner": "bloodthinner",
-    "Thyroid": "thyroid", "Digestive": "gi",
+    "diabetes": "diabetes", "cardiac": "cardiac", "respiratory": "respiratory",
+    "psych": "psych", "opioid": "opioid",
+    "anticonvulsant": "anticonvulsant", "bloodthinner": "bloodthinner",
+    "thyroid": "thyroid", "digestive": "gi",
 }
 
 def get_esi_prediction(
@@ -23,10 +23,7 @@ def get_esi_prediction(
         "temperature": temperature,
         "heartrate": heartrate,
         "pain": pain,
-        "medications": [MED_LABELS[m] for m in medications],
+        "medications": [MED_LABELS[m.lower()] for m in medications] if medications else [],
     }
 
-    _, _, mlp, _ = load_models("patient")
-
-    probs = mlp.predict_proba(X)
-    return cascade(probs)
+    return app_inference(X)

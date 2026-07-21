@@ -48,6 +48,17 @@ def single_inference(raw_data: pd.DataFrame, side: str):
 
     return result
 
+def app_inference(raw_data: pd.DataFrame):
+    side = "patient"
+    _, _, mlp, _ = load_models(side)
+    frame_builder = load_frame_builder(side)
+    X = frame_builder.build(raw_data)
+
+    probs = mlp.predict_proba(X)
+
+    return cascade(probs)
+
+
 def cascade(probs: np.ndarray, t1: float = 0.20, t2: float = 0.25) -> np.ndarray:
     """Priority-threshold cascade -> ESI 1-5.
 
