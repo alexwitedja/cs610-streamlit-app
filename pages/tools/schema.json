@@ -25,7 +25,7 @@
         },
         "temperature": {
           "type": ["number", "null"],
-          "description": "The patient's body temperature in degrees Celsius (e.g. 37.2, 38.9). Convert to Celsius if the patient reports Fahrenheit. Use null if they have not measured it."
+          "g": "The patient's body temperature in degrees Celsius (e.g. 37.2, 38.9). Convert to Celsius if the patient reports Fahrenheit. Use null if they have not measured it."
         },
         "heartrate": {
           "type": ["integer", "null"],
